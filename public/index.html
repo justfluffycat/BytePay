@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>BytePay – Simple, Signed, Transparent Payments</title>
+  <meta name="description" content="BytePay is a lightweight blockchain-based payment server with signed transactions and by1 addresses." />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    :root {
+      --blue-600: #2563eb;
+      --blue-500: #3b82f6;
+      --blue-100: #dbeafe;
+      --blue-50: #eff6ff;
+      --bg: #ffffff;
+      --bg-soft: #f6f9ff;
+      --card: #ffffff;
+      --fg: #0f172a;
+      --muted: #55627a;
+      --border: #e2e8f4;
+      --code-bg: #0f172a;
+      --code-fg: #dbeafe;
+      --green: #16a34a;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --blue-600: #60a5fa;
+        --blue-500: #3b82f6;
+        --blue-100: #1e3a8a;
+        --blue-50: #172554;
+        --bg: #0b1020;
+        --bg-soft: #0f1630;
+        --card: #121a36;
+        --fg: #eef2ff;
+        --muted: #a3b0cc;
+        --border: #222c4d;
+        --code-bg: #060a16;
+        --code-fg: #bfdbfe;
+        --green: #4ade80;
+      }
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--fg);
+      line-height: 1.65;
+    }
+    a { color: var(--blue-600); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { width: min(1040px, 92%); margin: 0 auto; }
+    section { padding: 4.5rem 0; }
+    section.alt { background: var(--bg-soft); }
+
+    h1, h2, h3 { line-height: 1.2; margin: 0; letter-spacing: -0.02em; }
+    h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); font-weight: 800; margin-bottom: .75rem; }
+    h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: .4rem; }
+    .lead { color: var(--muted); font-size: 1.1rem; max-width: 62ch; margin: 0 0 2rem; }
+    .eyebrow {
+      display: inline-block; font-size: .8rem; font-weight: 700; letter-spacing: .08em;
+      text-transform: uppercase; color: var(--blue-600); margin-bottom: .6rem;
+    }
+
+    /* Navigation */
+    nav {
+      position: sticky; top: 0; z-index: 10;
+      background: color-mix(in srgb, var(--bg) 88%, transparent);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-inner { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+    .brand { display: flex; align-items: center; gap: .6rem; font-weight: 800; font-size: 1.15rem; color: var(--fg); }
+    .nav-links { display: flex; gap: 1.4rem; font-size: .95rem; font-weight: 500; }
+    .nav-links a { color: var(--muted); }
+    .nav-links a:hover { color: var(--blue-600); text-decoration: none; }
+    @media (max-width: 680px) { .nav-links { display: none; } }
+
+    /* Hero */
+    .hero {
+      padding: 5rem 0 4rem;
+      background:
+        radial-gradient(900px 400px at 85% -10%, var(--blue-100), transparent 60%),
+        var(--bg);
+    }
+    .hero-title { display: flex; align-items: center; gap: 1.1rem; margin-bottom: 1rem; }
+    .hero-title img { width: 128px; height: 128px; filter: drop-shadow(0 8px 18px rgba(37, 99, 235, .35)); }
+    .hero h1 { font-size: clamp(2.4rem, 6vw, 3.8rem); font-weight: 800; }
+    .hero h1 span { color: var(--blue-600); }
+    .hero p { color: var(--muted); font-size: 1.15rem; max-width: 60ch; margin: 0 0 1.75rem; }
+
+    .status {
+      display: inline-flex; align-items: center; gap: .55rem;
+      background: var(--card); border: 1px solid var(--border);
+      padding: .5rem .95rem; border-radius: 999px; font-weight: 600; font-size: .95rem;
+      margin-bottom: 1.5rem;
+    }
+    .dot {
+      width: 10px; height: 10px; border-radius: 50%; background: var(--green);
+      box-shadow: 0 0 0 0 rgba(22, 163, 74, .6); animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      70% { box-shadow: 0 0 0 10px rgba(22, 163, 74, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(22, 163, 74, 0); }
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: .6rem; }
+    .chip {
+      background: var(--blue-50); color: var(--blue-600); border: 1px solid var(--blue-100);
+      padding: .35rem .85rem; border-radius: 999px; font-size: .88rem; font-weight: 600;
+    }
+    code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+    .chip code { font-weight: 700; }
+
+    /* Cards */
+    .grid { display: grid; gap: 1.1rem; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+    .card {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: 16px; padding: 1.4rem;
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+    .card:hover { transform: translateY(-3px); box-shadow: 0 12px 28px rgba(37, 99, 235, .12); }
+    .card p { margin: 0; color: var(--muted); font-size: .96rem; }
+    .icon {
+      width: 42px; height: 42px; border-radius: 12px; background: var(--blue-50);
+      display: grid; place-items: center; margin-bottom: .9rem; font-size: 1.25rem;
+    }
+
+    /* Steps */
+    .steps { counter-reset: step; display: grid; gap: 1rem; }
+    .step {
+      display: flex; gap: 1rem; align-items: flex-start;
+      background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 1.2rem 1.4rem;
+    }
+    .step::before {
+      counter-increment: step; content: counter(step);
+      flex: none; width: 36px; height: 36px; border-radius: 50%;
+      background: var(--blue-600); color: #fff; font-weight: 800;
+      display: grid; place-items: center;
+    }
+    .step p { margin: 0; color: var(--muted); font-size: .96rem; }
+
+    /* Address block */
+    .split { display: grid; gap: 2rem; grid-template-columns: 1fr 1fr; align-items: center; }
+    @media (max-width: 760px) { .split { grid-template-columns: 1fr; } }
+    .address-box {
+      background: var(--code-bg); color: var(--code-fg); border-radius: 16px;
+      padding: 1.4rem; font-size: .95rem; overflow-x: auto;
+    }
+    .address-box .label { color: #7d8db3; font-size: .78rem; text-transform: uppercase; letter-spacing: .08em; display: block; margin-bottom: .5rem; }
+    .address-box .prefix { color: #60a5fa; font-weight: 700; }
+    .address-box .rest { color: #e2e8f0; word-break: break-all; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: 16px; background: var(--card); }
+    table { width: 100%; border-collapse: collapse; font-size: .93rem; min-width: 560px; }
+    th, td { text-align: left; padding: .85rem 1.1rem; border-bottom: 1px solid var(--border); }
+    th { background: var(--blue-50); color: var(--blue-600); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; }
+    tr:last-child td { border-bottom: 0; }
+    td:last-child { color: var(--muted); }
+    .method { font-weight: 700; font-size: .78rem; padding: .15rem .5rem; border-radius: 6px; margin-right: .4rem; }
+    .get { background: #dcfce7; color: #166534; }
+    .post { background: var(--blue-100); color: #1d4ed8; }
+    @media (prefers-color-scheme: dark) {
+      .get { background: #14532d; color: #bbf7d0; }
+      .post { color: #bfdbfe; }
+    }
+
+    /* Notice */
+    .notice {
+      border-left: 4px solid var(--blue-600); background: var(--blue-50);
+      border-radius: 0 14px 14px 0; padding: 1.1rem 1.3rem;
+    }
+    .notice p { margin: .3rem 0 0; color: var(--muted); }
+    .notice ul { margin: .5rem 0 0; padding-left: 1.2rem; color: var(--muted); }
+
+    footer { border-top: 1px solid var(--border); padding: 2rem 0; color: var(--muted); font-size: .9rem; }
+    .foot { display: flex; flex-wrap: wrap; gap: 1rem; justify-content: space-between; align-items: center; }
+    .foot .brand { font-size: 1rem; }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="container nav-inner">
+      <a class="brand" href="#top">
+        BytePay
+      </a>
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#address">Address</a>
+        <a href="#api">API</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 1. Server status + hero -->
+  <header class="hero" id="top">
+    <div class="container">
+      <div class="status"><span class="dot"></span> BytePay server is running</div>
+
+      <div class="hero-title">
+        <h1>Byte<span>Pay</span></h1>
+      </div>
+
+      <p>
+        A lightweight blockchain-powered payment server. Every account has a unique address,
+        every transfer is digitally signed, and every block is chained together with SHA-256 hashes.
+      </p>
+
+      <!-- 3. Address prefix -->
+      <div class="chips">
+        <span class="chip">All addresses start with <code>by1</code></span>
+        <span class="chip">Ed25519 signatures</span>
+        <span class="chip">SHA-256 hash chain</span>
+        <span class="chip">Built with Node.js &amp; Express</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 2. About -->
+  <section id="about">
+    <div class="container">
+      <span class="eyebrow">About BytePay</span>
+      <h2>What is BytePay?</h2>
+      <p class="lead">
+        BytePay is a simple payment network that runs on a small Node.js server. It keeps a ledger of
+        account balances and records every transfer inside a blockchain, so the history of payments
+        can always be inspected and verified.
+      </p>
+      <div class="grid">
+        <div class="card">
+          <div class="icon">🏦</div>
+          <h3>Accounts</h3>
+          <p>Create an account and receive a unique <code>by1</code> address derived from your public key, plus a small starting balance.</p>
+        </div>
+        <div class="card">
+          <div class="icon">💸</div>
+          <h3>Transfers</h3>
+          <p>Send coins to any other BytePay address. Amounts are whole numbers, so there are no rounding errors.</p>
+        </div>
+        <div class="card">
+          <div class="icon">⛓️</div>
+          <h3>Blockchain ledger</h3>
+          <p>Transactions are grouped into blocks of three. Each block stores the hash of the previous one, forming a tamper-evident chain.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="alt" id="features">
+    <div class="container">
+      <span class="eyebrow">Features</span>
+      <h2>Built to be simple and safe</h2>
+      <p class="lead">BytePay keeps the design small, but the core rules of a payment system are enforced on every request.</p>
+      <div class="grid">
+        <div class="card">
+          <div class="icon">✍️</div>
+          <h3>Signed transactions</h3>
+          <p>Only the owner of the private key can spend from an address. Each transfer carries an Ed25519 signature that the server verifies.</p>
+        </div>
+        <div class="card">
+          <div class="icon">🔁</div>
+          <h3>Replay protection</h3>
+          <p>Every account has a nonce that must increase by exactly one, so a signed transaction can never be submitted twice.</p>
+        </div>
+        <div class="card">
+          <div class="icon">✅</div>
+          <h3>Strict validation</h3>
+          <p>Amounts must be positive integers, both accounts must exist, and the sender must have enough balance.</p>
+        </div>
+        <div class="card">
+          <div class="icon">🚰</div>
+          <h3>Rate-limited faucet</h3>
+          <p>New accounts receive 10 starting coins. Account creation is limited to one per IP address per minute to prevent abuse.</p>
+        </div>
+        <div class="card">
+          <div class="icon">🔍</div>
+          <h3>Chain validation</h3>
+          <p>A built-in endpoint re-computes every block hash and checks the links between blocks to detect tampering.</p>
+        </div>
+        <div class="card">
+          <div class="icon">⚡</div>
+          <h3>Lightweight</h3>
+          <p>One file, two dependencies, zero setup. BytePay runs anywhere Node.js runs, in a single process.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how">
+    <div class="container">
+      <span class="eyebrow">How it works</span>
+      <h2>From account to block in five steps</h2>
+      <p class="lead">Here is what happens when someone uses BytePay.</p>
+      <div class="steps">
+        <div class="step"><div><h3>Create an account</h3><p>A key pair is created, and the address is generated from the public key. The account starts with 10 coins.</p></div></div>
+        <div class="step"><div><h3>Sign a transaction</h3><p>The sender signs the message <code>from:to:amount:nonce</code> with their private key.</p></div></div>
+        <div class="step"><div><h3>The server verifies it</h3><p>BytePay checks the signature, the nonce, the amount, and the sender's balance before accepting anything.</p></div></div>
+        <div class="step"><div><h3>Balances are updated</h3><p>Coins move from the sender to the recipient, and the transaction joins the pending list.</p></div></div>
+        <div class="step"><div><h3>A block is created</h3><p>Once three transactions are pending, they are sealed into a new block linked to the previous block by its hash.</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. Address -->
+  <section class="alt" id="address">
+    <div class="container split">
+      <div>
+        <span class="eyebrow">Address format</span>
+        <h2>Every address starts with <span style="color: var(--blue-600)">by1</span></h2>
+        <p class="lead" style="margin-bottom: 0">
+          A BytePay address is the prefix <code>by1</code> followed by 40 hexadecimal characters taken from the
+          SHA-256 hash of the account's public key. That means an address can't be chosen or faked
+          without the matching key, and typos are easy to spot because the prefix is always the same.
+        </p>
+      </div>
+      <div class="address-box mono">
+        <span class="label">Example address</span>
+        <span class="prefix">by1</span><span class="rest">9f3a7c21b84e05d6a1c3f7e2908b4d5c61a7e3f0</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- API -->
+  <section id="api">
+    <div class="container">
+      <span class="eyebrow">API reference</span>
+      <h2>Available endpoints</h2>
+      <p class="lead">BytePay exposes a small JSON API.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Endpoint</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><span class="method post">POST</span><code>/create</code></td><td>Create a new account and receive the starting balance.</td></tr>
+            <tr><td><span class="method post">POST</span><code>/send</code></td><td>Send coins using a signed transaction.</td></tr>
+            <tr><td><span class="method get">GET</span><code>/balance/:address</code></td><td>Check the balance of an address.</td></tr>
+            <tr><td><span class="method get">GET</span><code>/nonce/:address</code></td><td>Get the next nonce to use for an address.</td></tr>
+            <tr><td><span class="method get">GET</span><code>/chain</code></td><td>View all blocks and pending transactions.</td></tr>
+            <tr><td><span class="method get">GET</span><code>/validate</code></td><td>Verify the integrity of the blockchain.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- Notes -->
+  <section class="alt">
+    <div class="container">
+      <div class="notice">
+        <h3>Good to know</h3>
+        <ul>
+          <li>BytePay is a learning and demo project, not a real-world currency.</li>
+          <li>Data is stored in memory, so balances and blocks reset whenever the server restarts.</li>
+          <li>Never share your private key. Anyone who has it can spend your coins.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container foot">
+      <a class="brand" href="#top">
+        BytePay
+      </a>
+      <span>© 2026 BytePay. All rights reserved.</span>
+    </div>
+  </footer>
+
+</body>
+</html>
